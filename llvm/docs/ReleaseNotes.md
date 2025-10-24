@@ -154,9 +154,22 @@ Changes to the MIPS Backend
 ---------------------------
 
 * `-mcpu=i6400` and `-mcpu=i6500` were added.
+* Added support for `mipsel-windows-gnu` and `mipsel-windows-msvc` targets.
 
 Changes to the PowerPC Backend
 ------------------------------
+
+* Add spill and restore for DMR and DMRp registers.
+* Prototype various Dense Math Facility instructions, and intrinsics for basic enablement, insert/extract, integer and FP calculations.
+* Add prototype for Dense Math Facility cryptography instructions.
+* Implement load/stores prototype for v1024i1, v2048i1.
+* Support conversion between f16 and f128.
+* Change default for auto gen stxvp for cpu=future.
+* Setup initial JITLink build support for XCOFF.
+* Add an API to derive the default feature set from a CPU name within the TargetParser
+  (e.g. `pwr10` -> `+vsx`,`+isa3_1`,`+mma`). Clang now uses this to populate the `target-feature`
+  list when `-mcpu` is provided for PowerPC.
+* Various bug fixes and codegen improvements.
 
 Changes to the RISC-V Backend
 -----------------------------
@@ -219,6 +232,7 @@ Changes to the RISC-V Backend
 * Removed -mattr=+no-rvc-hints that could be used to disable parsing and generation of RVC hints.
 * Adds assembler support for the Andes `XAndesvsintload` (Andes Vector INT4 Load extension).
 * Adds assembler support for the Andes `XAndesbfhcvt` (Andes Scalar BFLOAT16 Conversion extension).
+* Add combine for shadd family of instructions.
 
 Changes to the WebAssembly Backend
 ----------------------------------
@@ -228,11 +242,14 @@ Changes to the Windows Target
 
 * `fp128` is now passed indirectly, meaning it uses the same calling convention
   as `i128`.
+* Added support for `mipsel-windows-gnu` and `mipsel-windows-msvc` targets.
 
 Changes to the X86 Backend
 --------------------------
 
 * `fp128` will now use `*f128` libcalls on 32-bit GNU targets as well.
+* On x86-32, `fp128` and `i128` are now passed with the expected 16-byte stack
+  alignment.
 
 Changes to the OCaml bindings
 -----------------------------
@@ -311,10 +328,21 @@ Changes to LLDB
     stop reason = SIGSEGV: sent by tkill system call (sender pid=649752, uid=2667987)
   ```
 * ELF Cores can now have their siginfo structures inspected using `thread siginfo`.
+* LLDB now uses
+  [DIL](https://discourse.llvm.org/t/rfc-data-inspection-language/69893) as the
+  default implementation for 'frame variable'. This should not change the
+  behavior of 'frame variable' at all, at this time. To revert to using the
+  old implementation use: `settings set target.experimental.use-DIL false`.
 * Disassembly of unknown instructions now produces `<unknown>` instead of
   nothing at all
 * Changed the format of opcode bytes to match llvm-objdump when disassembling
   RISC-V code with `disassemble`'s `--byte` option.
+* LLDB added native support for the Model Context Protocol  (MCP). An MCP
+  server can be started with the `protocol-server start MCP` command.
+* On AArch64 Linux, LLDB will now show the state of the `STORE_ONLY` field of
+  `mte_ctrl`. This will only be shown on hardware that has the
+  `FEAT_MTE_STORE_ONLY` architecture feature.
+
 
 ### Changes to lldb-dap
 
@@ -329,6 +357,18 @@ Changes to Sanitizers
 
 Other Changes
 -------------
+* A new ThinLTO backend has been added to implement the
+  [Integrated Distributed ThinLTO](https://llvm.org/docs/DTLTO.html) (DTLTO)
+  feature. This new backend delegates the ThinLTO backend compilation jobs to an
+  external process (the distributor), which in turn coordinates distribution
+  through a system such as Incredibuild. A JSON interface is used for
+  communication with the distributor.
+  ([#47468](https://github.com/llvm/llvm-project/issues/47468)).
+
+Changes to the Profile Runtime
+---------------------
+
+* On AIX, avoid using mmap when reading profile files from a non-local filesystem.
 
 External Open Source Projects Using LLVM {{env.config.release}}
 ===============================================================

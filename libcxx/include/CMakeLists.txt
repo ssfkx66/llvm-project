@@ -535,6 +535,7 @@ set(files
   __locale_dir/time.h
   __locale_dir/wbuffer_convert.h
   __locale_dir/wstring_convert.h
+  __log_hardening_failure
   __math/abs.h
   __math/copysign.h
   __math/error_functions.h
@@ -873,6 +874,7 @@ set(files
   __type_traits/is_trivially_relocatable.h
   __type_traits/is_unbounded_array.h
   __type_traits/is_union.h
+  __type_traits/is_unqualified.h
   __type_traits/is_unsigned.h
   __type_traits/is_valid_expansion.h
   __type_traits/is_void.h
